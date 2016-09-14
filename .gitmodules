@@ -1,0 +1,18 @@
+[submodule "local/relationship"]
+	path = local/relationship
+	url = https://github.com/UFSC/moodle-local-relationship.git
+[submodule "local/report_config"]
+	path = local/report_config
+	url = https://github.com/UFSC/moodle-local-report_config.git
+[submodule "local/tutores"]
+	path = local/tutores
+	url = https://github.com/UFSC/moodle-local-tutores.git
+[submodule "report/unasus"]
+	path = report/unasus
+	url = https://github.com/UFSC/moodle-report-unasus.git
+[submodule "webservice/soapfda"]
+	path = webservice/soapfda
+	url = https://github.com/UFSC/moodle-webservice_soapfda.git
+[submodule "local/wstcc"]
+	path = local/wstcc
+	url = https://github.com/UFSC/moodle-local-wstcc.git
