@@ -1,0 +1,12 @@
+[submodule "report/unasus"]
+	path = report/unasus
+	url = https://github.com/UFSC/moodle-report-unasus.git
+[submodule "local/relationship"]
+	path = local/relationship
+	url = https://github.com/UFSC/moodle-local-relationship.git
+[submodule "local/tutores"]
+	path = local/tutores
+	url = https://github.com/UFSC/moodle-local-tutores.git
+[submodule "local/report_config"]
+	path = local/report_config
+	url = https://github.com/UFSC/moodle-local-report_config.git
