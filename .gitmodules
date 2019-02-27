@@ -1,0 +1,12 @@
+[submodule "local/relationship"]
+	path = local/relationship
+	url = https://github.com/UFSC/moodle-local-relationship.git
+[submodule "enrol/relationship"]
+	path = enrol/relationship
+	url = https://github.com/UFSC/moodle-enrol-relationship
+[submodule "local/wstcc"]
+	path = local/wstcc
+	url = https://github.com/UFSC/moodle-local-wstcc.git
+[submodule "local/tutores"]
+	path = local/tutores
+	url = https://github.com/UFSC/moodle-local-tutores.git

@@ -1372,28 +1372,16 @@ function lti_map_keyname($key, $tolower = true) {
  */
 function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
     $roles = array();
+    $archetypes_roles = Array('student' => 'Learner', 'teacher' => 'Instructor', 'editingteacher' => 'Instructor', 'manager' => 'Administrator');
 
     if (empty($cmid)) {
         // If no cmid is passed, check if the user is a teacher in the course
         // This allows other modules to programmatically "fake" a launch without
         // a real LTI instance.
         $context = context_course::instance($courseid);
-
-        if (has_capability('moodle/course:manageactivities', $context, $user)) {
-            array_push($roles, 'Instructor');
-        } else {
-            array_push($roles, 'Learner');
-        }
     } else {
         $context = context_module::instance($cmid);
-
-        if (has_capability('mod/lti:manage', $context)) {
-            array_push($roles, 'Instructor');
-        } else {
-            array_push($roles, 'Learner');
-        }
     }
-
     if (is_siteadmin($user) || has_capability('mod/lti:admin', $context)) {
         // Make sure admins do not have the Learner role, then set admin role.
         $roles = array_diff($roles, array('Learner'));
@@ -1401,6 +1389,15 @@ function lti_get_ims_role($user, $cmid, $courseid, $islti2) {
             array_push($roles, 'urn:lti:sysrole:ims/lis/Administrator', 'urn:lti:instrole:ims/lis/Administrator');
         } else {
             array_push($roles, 'http://purl.imsglobal.org/vocab/lis/v2/person#Administrator');
+        }
+    }
+    $user_roles = lti_get_user_roles_with_archetypes($context, $user->id);
+
+    foreach ($user_roles as $role) {
+        array_push($roles, "urn:moodle:role/{$role->shortname}");
+
+        if (!empty($role->archetype) && !empty($archetypes_roles[$role->archetype])) {
+            array_push($roles, "urn:lti:role:ims/lis/{$archetypes_roles[$role->archetype]}");
         }
     }
 
@@ -3268,4 +3265,43 @@ function get_tag($tagname, $xpath, $attribute = null) {
         return $result->item(0)->nodeValue;
     }
     return null;
+}
+/**
+ * Gets the user roles and archetypes to be used as LTI launch data
+ * @param context $context
+ * @param int $userid
+ * @param bool $checkparentcontexts
+ * @param string $order
+ * @return array
+ */
+function lti_get_user_roles_with_archetypes(context $context, $userid = 0, $checkparentcontexts = true, $order = 'c.contextlevel DESC, r.sortorder ASC') {
+        global $USER, $DB;
+
+    if (empty($userid)) {
+                if (empty($USER->id)) {
+                        return array();
+        }
+        $userid = $USER->id;
+    }
+
+    if ($checkparentcontexts) {
+                $contextids = $context->get_parent_context_ids();
+            } else {
+                $contextids = array();
+            }
+    $contextids[] = $context->id;
+
+    list($contextids, $params) = $DB->get_in_or_equal($contextids, SQL_PARAMS_QM);
+
+    array_unshift($params, $userid);
+
+    $sql = "SELECT ra.*, r.name, r.shortname, r.archetype
+              FROM {role_assignments} ra, {role} r, {context} c
+             WHERE ra.userid = ?
+                   AND ra.roleid = r.id
+                   AND ra.contextid = c.id
+                   AND ra.contextid $contextids
+          ORDER BY $order";
+
+    return $DB->get_records_sql($sql, $params);
 }
